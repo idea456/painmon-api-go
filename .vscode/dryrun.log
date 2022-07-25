@@ -1,0 +1,5 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/idea456/Documents/painmon-api-go'
+go run server.go
+make: Leaving directory `/Users/idea456/Documents/painmon-api-go'
+ 
