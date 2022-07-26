@@ -1,5 +1,5 @@
 start:
-	go run server.go
+	go run api/server.go
 
-fetch:
-	go run data/fetch_json.go
+update:
+	./scripts/fetch-data.sh
