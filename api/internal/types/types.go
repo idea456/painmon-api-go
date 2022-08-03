@@ -20,6 +20,17 @@ type Artifact struct {
 	Rarity []string `json:"rarity"`
 }
 
+type Weapon struct {
+	Name     string `json:"name"`
+	Rarity   string `json:"rarity"`
+	Material string `json:"weaponmaterialtype"`
+}
+type WeaponMaterial struct {
+	Name   string   `json:"name"`
+	Day    []string `json:"day"`
+	Domain string   `json:"domainofforgery"`
+}
+
 type Entry interface {
-	Artifact | Talent | TalentMaterial
+	Artifact | Talent | TalentMaterial | Weapon | WeaponMaterial
 }
