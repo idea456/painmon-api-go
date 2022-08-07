@@ -31,6 +31,19 @@ type WeaponMaterial struct {
 	Domain string   `json:"domainofforgery"`
 }
 
+type Domain struct {
+	Id    string
+	Name  string
+	Ar    int
+	Level int
+}
+
+type DomainCategory struct {
+	Name      string
+	Domains   []Domain
+	Artifacts []string
+}
+
 type Entry interface {
 	Artifact | Talent | TalentMaterial | Weapon | WeaponMaterial
 }

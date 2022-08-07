@@ -1,0 +1,16 @@
+type Domain {
+    id: ID!
+    name: String!
+    ar: Int
+    level: Int
+}
+
+type DomainCategory {
+    name: String!
+    domains: [Domain]
+    artifacts: [String]
+}
+
+type Query {
+    getDomainCategories: [DomainCategory]
+}

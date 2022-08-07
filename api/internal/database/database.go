@@ -2,15 +2,19 @@ package database
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	redis "github.com/gomodule/redigo/redis"
 	opener "github.com/idea456/painmon-api-go/internal/opener"
 	"github.com/idea456/painmon-api-go/internal/types"
 	rejson "github.com/nitishm/go-rejson/v4"
 )
+
+var lock = &sync.Mutex{}
 
 type Config struct {
 	Port int
@@ -21,44 +25,51 @@ type Database struct {
 	Connection redis.Conn
 }
 
+var database *Database
+
 func InitializeDatabase() *Database {
-	conn, err := redis.Dial("tcp", ":6379")
-	if err != nil {
-		log.Fatalf("Unable to establish connection to Redis: %s", err)
+	if database == nil {
+		lock.Lock()
+		defer lock.Unlock()
+		if database == nil {
+			log.Println("Creating database connection...")
+			conn, err := redis.Dial("tcp", ":6379")
+			if err != nil {
+				log.Fatalf("Unable to establish connection to Redis: %s", err)
+			}
+			log.Println("Successfully established connection to Redis!")
+			rh := rejson.NewReJSONHandler()
+			rh.SetRedigoClient(conn)
+			database = &Database{
+				Handler:    rh,
+				Connection: conn,
+			}
+		}
 	}
 
-	// defer func() {
-	// 	_, err := conn.Do("FLUSHALL")
-	// 	log.Printf("Closing Redis connection...\n")
-	// 	err = conn.Close()
-	// 	if err != nil {
-	// 		log.Fatalf("Failed to communicate with Redis: %v", err)
-	// 	}
-	// }()
+	return database
+}
 
-	log.Println("Successfully established connection to Redis!")
-
-	rh := rejson.NewReJSONHandler()
-	rh.SetRedigoClient(conn)
-
-	return &Database{
-		Handler: rh,
+func (db *Database) Close() {
+	_, err := db.Connection.Do("FLUSHALL")
+	log.Printf("Closing Redis connection...\n")
+	err = db.Connection.Close()
+	if err != nil {
+		log.Fatalf("Failed to communicate with Redis: %v", err)
 	}
 }
 
 var ctx = context.Background()
 
 func (db *Database) InsertAll() {
-	directories := []string{"artifacts", "talentmaterialtypes", "talents", "weaponmaterialtypes", "weapons"}
-
-	for _, directory := range directories {
-		files := opener.OpenDirectory(directory)
+	for _, directory := range opener.GetDirectoryFiles("db/data/src/data/English") {
+		files := opener.OpenDataDirectory(directory.Name())
 
 		for _, file := range files.Files {
 			fileName := file.Name()
 			var obj interface{}
 			if !file.IsDir() {
-				switch directory {
+				switch directory.Name() {
 				case "artifacts":
 					obj = opener.OpenJSON[types.Artifact](filepath.Join(files.Path, fileName))
 				case "talentmaterialtypes":
@@ -71,26 +82,35 @@ func (db *Database) InsertAll() {
 					obj = opener.OpenJSON[types.Weapon](filepath.Join(files.Path, fileName))
 				}
 				key := strings.Split(fileName, ".")[0]
-				db.Set(key, obj)
+				Set(key, obj)
 			}
 		}
 	}
 }
 
-func (db *Database) Set(key string, obj interface{}) {
+func Set(key string, obj interface{}) {
+	db := InitializeDatabase()
 	res, err := db.Handler.JSONSet(key, ".", obj)
 	if err != nil {
 		log.Fatalf("Failed to SET object: %v\n", err)
 	}
-	log.Printf("Set %s: %+v\n", key, res)
+	log.Printf("[Database] Set %s: %+v\n", key, res)
 
 }
 
-func (db *Database) Get(key string) interface{} {
+// golang does not support type parameters on methods as of now: https://github.com/golang/go/issues/49085
+func Get[T types.Entry](key string) T {
+	db := InitializeDatabase()
 	res, err := db.Handler.JSONGet(key, ".")
 	if err != nil {
 		log.Fatalf("Failed to GET object: %v", err)
 	}
-	log.Printf("Get %s: %+v\n", key, res)
-	return res
+	log.Printf("[Database] Get %s: OK\n", key)
+
+	var obj T
+	err = json.Unmarshal(res.([]byte), &obj)
+	if err != nil {
+		log.Printf("Error in unmarshalling object: %+v\n", err)
+	}
+	return obj
 }

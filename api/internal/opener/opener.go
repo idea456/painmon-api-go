@@ -41,13 +41,19 @@ func OpenJSON[T types.Entry](path string) T {
 	return entry
 }
 
-func OpenDirectory(directory string) *Files {
+func GetDirectoryFiles(directoryPath string) []fs.FileInfo {
 	ChangeHomeDirectory()
-	directoryPath := filepath.Join("db/data/src/data/English", directory)
 	files, err := ioutil.ReadDir(directoryPath)
 	if err != nil {
 		log.Fatalf("Failed to open directory: %v\n", err)
 	}
+	return files
+}
+
+func OpenDataDirectory(directory string) *Files {
+	ChangeHomeDirectory()
+	directoryPath := filepath.Join("db/data/src/data/English", directory)
+	files := GetDirectoryFiles(directoryPath)
 
 	return &Files{
 		Files: files,

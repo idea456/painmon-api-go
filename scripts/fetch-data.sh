@@ -1,7 +1,7 @@
 DIR="$PWD/db/data"
 
 #required subdirectories to fetch data only
-PATHS=("talents" "talentmaterialtypes" "weapons" "weaponmaterialtypes" "artifacts")
+PATHS=("talents" "talentmaterialtypes" "weapons" "weaponmaterialtypes" "artifacts" "domains")
 
 if [ -d "$DIR" ]; then
     if [ $PWD != $DIR ]; then
@@ -16,6 +16,7 @@ else
     git config core.sparseCheckout true
     git remote add db "https://github.com/theBowja/genshin-db.git"
     for path in "${PATHS[@]}"; do
+        echo "Fetching ${path}..."
         echo "src/data/English/${path}" >>.git/info/sparse-checkout
     done
 fi

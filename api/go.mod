@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.13
+	github.com/chromedp/chromedp v0.8.3
 	github.com/gomodule/redigo v1.8.9
 	github.com/nitishm/go-rejson/v4 v4.1.0
 	github.com/vektah/gqlparser/v2 v2.4.7
@@ -13,7 +14,6 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
 	github.com/chromedp/cdproto v0.0.0-20220801115359-6a862c1fb810 // indirect
-	github.com/chromedp/chromedp v0.8.3 // indirect
 	github.com/chromedp/sysutil v1.0.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
