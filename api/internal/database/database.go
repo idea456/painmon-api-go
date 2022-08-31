@@ -61,29 +61,44 @@ func (db *Database) Close() {
 
 var ctx = context.Background()
 
+func setDataCategory[T types.Entry](obj map[string]map[string]interface{}, kind string, entryPath string, id string) {
+	entry := opener.OpenJSON[T](entryPath)
+
+	if _, ok := obj[kind]; !ok {
+		obj[kind] = make(map[string]interface{})
+	}
+	obj[kind][strings.Split(id, ".")[0]] = entry
+}
+
 func (db *Database) InsertAll() {
 	for _, directory := range opener.GetDirectoryFiles("db/data/src/data/English") {
 		files := opener.OpenDataDirectory(directory.Name())
+		obj := make(map[string]map[string]interface{})
 
 		for _, file := range files.Files {
 			fileName := file.Name()
-			var obj interface{}
 			if !file.IsDir() {
+				entryPath := filepath.Join(files.Path, fileName)
 				switch directory.Name() {
 				case "artifacts":
-					obj = opener.OpenJSON[types.Artifact](filepath.Join(files.Path, fileName))
+					setDataCategory[types.Artifact](obj, "artifacts", entryPath, fileName)
 				case "talentmaterialtypes":
-					obj = opener.OpenJSON[types.TalentMaterial](filepath.Join(files.Path, fileName))
+					setDataCategory[types.TalentMaterial](obj, "talentmaterialtypes", entryPath, fileName)
 				case "talents":
-					obj = opener.OpenJSON[types.Talent](filepath.Join(files.Path, fileName))
+					setDataCategory[types.Talent](obj, "talent", entryPath, fileName)
 				case "weaponmaterialtypes":
-					obj = opener.OpenJSON[types.WeaponMaterial](filepath.Join(files.Path, fileName))
+					setDataCategory[types.WeaponMaterial](obj, "weaponmaterialtypes", entryPath, fileName)
 				case "weapons":
-					obj = opener.OpenJSON[types.Weapon](filepath.Join(files.Path, fileName))
+					setDataCategory[types.Weapon](obj, "weapons", entryPath, fileName)
+				case "domains":
+					setDataCategory[types.Domain](obj, "domains", entryPath, fileName)
 				}
-				key := strings.Split(fileName, ".")[0]
-				Set(key, obj)
 			}
+
+			for key := range obj {
+				Set(key, obj[key])
+			}
+
 		}
 	}
 }
@@ -98,7 +113,21 @@ func Set(key string, obj interface{}) {
 
 }
 
+func GetCategory[T types.Entry](category string) map[string]T {
+	db := InitializeDatabase()
+	res, err := db.Handler.JSONGet(category, ".")
+	if err != nil {
+		log.Fatalf("Failed to GET category %s: %v", category, err)
+	}
+	log.Printf("[Database] Get category %s\n", category)
+
+	var buffer map[string]T
+	json.Unmarshal(res.([]uint8), &buffer)
+	return buffer
+}
+
 // golang does not support type parameters on methods as of now: https://github.com/golang/go/issues/49085
+// therefore initializing methods such as Get, Query and GetCategory as functions instead of Database's methods
 func Get[T types.Entry](key string) T {
 	db := InitializeDatabase()
 	res, err := db.Handler.JSONGet(key, ".")
@@ -114,3 +143,10 @@ func Get[T types.Entry](key string) T {
 	}
 	return obj
 }
+
+// TODO: Improve daily queries with Redisearch indexes
+// func Query(day string) {
+// 	db := InitializeDatabase()
+
+// 	db.Connection.Do("FT.CREATE", weaponMaterialsIdx, )
+// }

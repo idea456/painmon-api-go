@@ -1,5 +1,17 @@
 package types
 
+import "time"
+
+// TODO: Include this type after "materials" data is fetched
+// type Item struct {
+// 	Name        string   `json:"name"`
+// 	Description string   `json:"description"`
+// 	Rarity      int      `json:"rarity"`
+// 	Day         []string `json:"daysofweek"`
+// 	Type        string   `json:"materialtype"`
+// 	Domain      string   `json:"dropdomain"`
+// }
+
 type Talent struct {
 	Name  string     `json:"name"`
 	Costs TalentCost `json:"costs"`
@@ -10,9 +22,12 @@ type TalentCost struct {
 }
 
 type TalentMaterial struct {
-	Name   string   `json:"4starname"`
-	Day    []string `json:"day"`
-	Domain string   `json:"domainofmastery"`
+	Name          string   `json:"name"`
+	TwoStarName   string   `json:"2starname"`
+	ThreeStarName string   `json:"3starname"`
+	FourStarName  string   `json:"4starname"`
+	Day           []string `json:"day"`
+	Domain        string   `json:"domainofmastery"`
 }
 
 type Artifact struct {
@@ -26,16 +41,23 @@ type Weapon struct {
 	Material string `json:"weaponmaterialtype"`
 }
 type WeaponMaterial struct {
-	Name   string   `json:"name"`
-	Day    []string `json:"day"`
-	Domain string   `json:"domainofforgery"`
+	Name          string   `json:"name"`
+	TwoStarName   string   `json:"2starname"`
+	ThreeStarName string   `json:"3starname"`
+	FourStarName  string   `json:"4starname"`
+	Day           []string `json:"day"`
+	Domain        string   `json:"domainofforgery"`
 }
 
 type Domain struct {
-	Id    string
-	Name  string
-	Ar    int
-	Level int
+	Name           string   `json:"name"`
+	Region         string   `json:"region"`
+	DomainType     string   `json:"domaintype"`
+	DomainCategory string   `json:"domainentrance"`
+	Level          int      `json:"recommendedlevel"`
+	Rewards        []Reward `json:"rewardpreview"`
+	Monsters       []string `json:"monsterlist"`
+	Disorder       []string `json:"disorder"`
 }
 
 type DomainCategory struct {
@@ -44,6 +66,18 @@ type DomainCategory struct {
 	Artifacts []string
 }
 
+type Reward struct {
+	Name   string `json:"name"`
+	Count  int    `json:"count"`
+	Rarity string `json:"rarity"`
+}
+
 type Entry interface {
-	Artifact | Talent | TalentMaterial | Weapon | WeaponMaterial
+	Artifact | Talent | TalentMaterial | Weapon | WeaponMaterial | Domain | DomainCategory
+}
+type Daily struct {
+	Date            time.Time
+	Day             string
+	TalentMaterials []TalentMaterial
+	WeaponMaterials []WeaponMaterial
 }

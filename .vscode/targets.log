@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
 
-
-# Make data base, printed on Sun Aug  7 20:01:22 2022
+# Make data base, printed on Mon Aug 29 15:16:00 2022
 
 # Variables
 
@@ -55,11 +52,13 @@ GOPATH = /Users/idea456/go
 # environment
 NVM_BIN = /Users/idea456/.nvm/versions/node/v15.14.0/bin
 # environment
+LaunchInstanceID = E400EBD8-2245-41E8-B819-BD64E301CB79
+# environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.RiGhFTEy1D/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.Shqb4D9Oi7/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -69,7 +68,7 @@ CONDA_EXE = /Users/idea456/miniforge3/bin/conda
 # environment
 TTY = not a tty
 # environment
-FIG_PID = 17031
+FIG_PID = 816
 # environment
 PWD = /Users/idea456/Documents/painmon-api-go
 # environment
@@ -82,11 +81,12 @@ MANPATH = /Users/idea456/.nvm/versions/node/v15.14.0/share/man:/opt/homebrew/sha
 GOMODCACHE = /Users/idea456/go/pkg/mod
 # environment
 HOME = /Users/idea456
+# environment
+POWERLINE_COMMAND = oh-my-posh
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
- 
-VSCODE_CODE_CACHE_PATH = /Users/idea456/Library/Application Support/Code/CachedData/da76f93349a72022ca4670c1b84860304616aaa2
+VSCODE_CODE_CACHE_PATH = /Users/idea456/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
 # environment
 LOGNAME = idea456
 # environment
@@ -111,6 +111,8 @@ MAKE = $(MAKE_COMMAND)
 MAKECMDGOALS := all
 # environment
 SHLVL = 1
+# environment
+POSH_THEME = /Users/idea456/.cache/oh-my-posh/config.omp.json
 # default
 MAKE_VERSION := 3.81
 # environment
@@ -132,7 +134,7 @@ TMPDIR = /var/folders/68/6_nb9cn10kz8hl3c3nwbr8gh0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/idea456/Library/Application Support/Code/1.70.0-main.sock
+VSCODE_IPC_HOOK = /Users/idea456/Library/Application Support/Code/1.70.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -144,7 +146,7 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/idea456/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.42788872.42788878
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.44634233.44634239
 # environment
 HOMEBREW_PREFIX = /opt/homebrew
 # automatic
@@ -167,6 +169,8 @@ PAGER = less
 LC_ALL = C
 # environment
 CONDA_PYTHON_EXE = /Users/idea456/miniforge3/bin/python
+# environment
+SECURITYSESSIONID = 186b3
 # automatic
 ^F = $(notdir $^)
 # default
@@ -180,13 +184,13 @@ MAKELEVEL := 0
 # environment
 CONDA_PREFIX = /Users/idea456/miniforge3
 # environment
-VSCODE_PID = 17022
+VSCODE_PID = 633
 # environment
 _CE_CONDA = 
 # environment
 LANG = C
 # variable set hash-table stats:
-# Load=85/1024=8%, Rehash=0, Collisions=3/109=3%
+# Load=89/1024=9%, Rehash=0, Collisions=3/113=3%
 
 # Pattern-specific Variable Values
 
@@ -194,9 +198,9 @@ LANG = C
 
 # Directories
 
-# . (device 16777234, inode 38012168): 11 files, no impossibilities.
+# . (device 16777230, inode 38012168): 12 files, no impossibilities.
 
-# 11 files, no impossibilities in 1 directories.
+# 12 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -222,7 +226,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-07 18:43:25
+#  Last modified 2022-08-07 23:16:16
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -244,6 +248,22 @@ update:
 	./scripts/fetch-data.sh
 	
 
+start-db:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 14):
+	docker run -it -p 6379:6379 idea456/painmon-api-go/db
+	
+
+build-db:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  commands to execute (from `Makefile', line 11):
+	docker build -t idea456/painmon-api-go/db ./db
+	
+
 generate:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
@@ -259,7 +279,7 @@ generate:
 #  File has not been updated.
 
 # files hash-table stats:
-# Load=7/1024=1%, Rehash=0, Collisions=0/19=0%
+# Load=9/1024=1%, Rehash=0, Collisions=0/21=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -271,6 +291,8 @@ generate:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun Aug  7 20:01:22 2022
+# Finished Make data base on Mon Aug 29 15:16:00 2022
 
  
+make: *** No rule to make target `all'.  Stop.
+

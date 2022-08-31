@@ -1,3 +1,5 @@
+scalar Time
+
 type Domain {
     id: ID!
     name: String!
@@ -11,6 +13,30 @@ type DomainCategory {
     artifacts: [String]
 }
 
+type Item {
+    id: ID
+    name: String
+    # TODO: Map other information about items after fetching "materials" data
+    # day: [String]
+    # rarity: Int
+}
+
+# just a combination of TalentMaterial and WeaponMaterial only
+type ItemGroup {
+    name: String!
+    day: String
+    domain: String
+    items: [Item]
+    type: String
+}
+
+type Daily {
+    date: Time
+    day: String
+    materials: [ItemGroup]
+}
+
 type Query {
     getDomainCategories: [DomainCategory]
+    getDaily: Daily
 }

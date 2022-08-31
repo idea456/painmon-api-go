@@ -2,6 +2,16 @@
 
 package model
 
+import (
+	"time"
+)
+
+type Daily struct {
+	Date      *time.Time   `json:"date"`
+	Day       *string      `json:"day"`
+	Materials []*ItemGroup `json:"materials"`
+}
+
 type Domain struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
@@ -13,4 +23,17 @@ type DomainCategory struct {
 	Name      string    `json:"name"`
 	Domains   []*Domain `json:"domains"`
 	Artifacts []*string `json:"artifacts"`
+}
+
+type Item struct {
+	ID   *string `json:"id"`
+	Name *string `json:"name"`
+}
+
+type ItemGroup struct {
+	Name   string  `json:"name"`
+	Day    *string `json:"day"`
+	Domain *string `json:"domain"`
+	Items  []*Item `json:"items"`
+	Type   *string `json:"type"`
 }

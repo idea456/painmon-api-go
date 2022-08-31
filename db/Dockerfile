@@ -1,3 +1,3 @@
-FROM redislabs/rejson
+FROM redislabs/redismod
 
 EXPOSE 6379
