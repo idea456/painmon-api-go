@@ -21,8 +21,23 @@ type TalentCost struct {
 	Cost []map[string]string `json:"lvl10"`
 }
 
-type TalentMaterial struct {
-	Name          string   `json:"name"`
+// type TalentMaterial struct {
+// 	Name          string   `json:"name"`
+// 	TwoStarName   string   `json:"2starname"`
+// 	ThreeStarName string   `json:"3starname"`
+// 	FourStarName  string   `json:"4starname"`
+// 	Day           []string `json:"day"`
+// 	Domain        string   `json:"domainofmastery"`
+// }
+
+type Artifact struct {
+	Name   string   `json:"name"`
+	Rarity []string `json:"rarity"`
+}
+
+type Material struct {
+	Name          string `json:"name"`
+	Type          string
 	TwoStarName   string   `json:"2starname"`
 	ThreeStarName string   `json:"3starname"`
 	FourStarName  string   `json:"4starname"`
@@ -30,24 +45,20 @@ type TalentMaterial struct {
 	Domain        string   `json:"domainofmastery"`
 }
 
-type Artifact struct {
-	Name   string   `json:"name"`
-	Rarity []string `json:"rarity"`
-}
-
 type Weapon struct {
 	Name     string `json:"name"`
 	Rarity   string `json:"rarity"`
 	Material string `json:"weaponmaterialtype"`
 }
-type WeaponMaterial struct {
-	Name          string   `json:"name"`
-	TwoStarName   string   `json:"2starname"`
-	ThreeStarName string   `json:"3starname"`
-	FourStarName  string   `json:"4starname"`
-	Day           []string `json:"day"`
-	Domain        string   `json:"domainofforgery"`
-}
+
+// type WeaponMaterial struct {
+// 	Name          string   `json:"name"`
+// 	TwoStarName   string   `json:"2starname"`
+// 	ThreeStarName string   `json:"3starname"`
+// 	FourStarName  string   `json:"4starname"`
+// 	Day           []string `json:"day"`
+// 	Domain        string   `json:"domainofforgery"`
+// }
 
 type Domain struct {
 	Name           string   `json:"name"`
@@ -73,11 +84,12 @@ type Reward struct {
 }
 
 type Entry interface {
-	Artifact | Talent | TalentMaterial | Weapon | WeaponMaterial | Domain | DomainCategory
+	Artifact | Talent | Weapon | Material | Domain | DomainCategory
 }
 type Daily struct {
-	Date            time.Time
-	Day             string
-	TalentMaterials []TalentMaterial
-	WeaponMaterials []WeaponMaterial
+	Date      time.Time
+	Day       string
+	Materials []Material
+	// TalentMaterials []Material
+	// WeaponMaterials []Material
 }

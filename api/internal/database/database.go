@@ -11,6 +11,7 @@ import (
 	redis "github.com/gomodule/redigo/redis"
 	opener "github.com/idea456/painmon-api-go/internal/opener"
 	"github.com/idea456/painmon-api-go/internal/types"
+	"github.com/idea456/painmon-api-go/pkg/utils"
 	rejson "github.com/nitishm/go-rejson/v4"
 )
 
@@ -67,7 +68,14 @@ func setDataCategory[T types.Entry](obj map[string]map[string]interface{}, kind 
 	if _, ok := obj[kind]; !ok {
 		obj[kind] = make(map[string]interface{})
 	}
-	obj[kind][strings.Split(id, ".")[0]] = entry
+
+	v, _ := any(entry).(types.Material)
+	if kind == "talentmaterialtypes" {
+		v.Type = utils.TALENT_MATERIAL_TYPE
+	} else if kind == "weaponmaterialtypes" {
+		v.Type = utils.WEAPON_MATERIAL_TYPE
+	}
+	obj[kind][strings.Split(id, ".")[0]] = v
 }
 
 func (db *Database) InsertAll() {
@@ -83,11 +91,11 @@ func (db *Database) InsertAll() {
 				case "artifacts":
 					setDataCategory[types.Artifact](obj, "artifacts", entryPath, fileName)
 				case "talentmaterialtypes":
-					setDataCategory[types.TalentMaterial](obj, "talentmaterialtypes", entryPath, fileName)
+					setDataCategory[types.Material](obj, "talentmaterialtypes", entryPath, fileName)
 				case "talents":
 					setDataCategory[types.Talent](obj, "talent", entryPath, fileName)
 				case "weaponmaterialtypes":
-					setDataCategory[types.WeaponMaterial](obj, "weaponmaterialtypes", entryPath, fileName)
+					setDataCategory[types.Material](obj, "weaponmaterialtypes", entryPath, fileName)
 				case "weapons":
 					setDataCategory[types.Weapon](obj, "weapons", entryPath, fileName)
 				case "domains":
@@ -123,6 +131,7 @@ func GetCategory[T types.Entry](category string) map[string]T {
 
 	var buffer map[string]T
 	json.Unmarshal(res.([]uint8), &buffer)
+
 	return buffer
 }
 

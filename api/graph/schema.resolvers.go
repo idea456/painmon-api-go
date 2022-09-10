@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/idea456/painmon-api-go/graph/generated"
@@ -22,9 +23,6 @@ func (r *queryResolver) GetDomainCategories(ctx context.Context) ([]*model.Domai
 
 	var category map[string]types.Domain = database.GetCategory[types.Domain]("domains")
 
-	// var category map[string]types.Domain
-	// json.Unmarshal(database.GetCategory("domains"), &category)
-
 	for domainName := range category {
 		domain := category[domainName]
 
@@ -34,69 +32,87 @@ func (r *queryResolver) GetDomainCategories(ctx context.Context) ([]*model.Domai
 		categories[domain.DomainCategory] = append(categories[domain.DomainCategory], domain)
 	}
 
-	for domainCategory := range categories {
-		domains := make([]*model.Domain, 0)
-		artifacts := make([]string, 0)
+	var wg sync.WaitGroup
+	wg.Add(len(categories))
 
-		for _, domain := range categories[domainCategory] {
-			domains = append(domains, types.MapDomain(domain))
-			for _, artifact := range domain.Rewards {
-				if !utils.In(artifacts, artifact.Name) {
-					artifacts = append(artifacts, artifact.Name)
+	for domainCategory := range categories {
+		go func(domainCategory string) {
+			defer wg.Done()
+
+			domains := make([]*model.Domain, 0)
+			artifacts := make([]string, 0)
+
+			for _, domain := range categories[domainCategory] {
+				domains = append(domains, types.MapDomain(domain))
+				for _, artifact := range domain.Rewards {
+					if !utils.In(artifacts, artifact.Name) {
+						artifacts = append(artifacts, artifact.Name)
+					}
 				}
 			}
-		}
 
-		domainCategories = append(domainCategories, &model.DomainCategory{
-			Name:      domainCategory,
-			Domains:   domains,
-			Artifacts: types.ToPointers[string](artifacts),
-		})
+			domainCategories = append(domainCategories, &model.DomainCategory{
+				Name:      domainCategory,
+				Domains:   domains,
+				Artifacts: types.ToPointers[string](artifacts),
+			})
+		}(domainCategory)
 	}
+
+	wg.Wait()
 
 	return domainCategories, nil
 }
 
 // GetDaily is the resolver for the getDaily field.
-
-// type Daily {
-//     date: Time
-//     day: String
-//     materials: [ItemGroup]
-// }
 func (r *queryResolver) GetDaily(ctx context.Context) (*model.Daily, error) {
 	today := time.Now()
 	day := today.Weekday().String()
 
-	talentMaterials := database.GetCategory[types.TalentMaterial](utils.TALENT_MATERIAL)
-	weaponMaterials := database.GetCategory[types.WeaponMaterial](utils.WEAPON_MATERIAL)
+	talentMaterials := database.GetCategory[types.Material](utils.TALENT_MATERIAL)
+	weaponMaterials := database.GetCategory[types.Material](utils.WEAPON_MATERIAL)
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	wg.Add(2)
+
 	materials := make([]*model.ItemGroup, 0)
+	filterMaterial := func(array map[string]types.Material) {
+		defer wg.Done()
+		for key := range array {
+			material := array[key]
+			if utils.In(material.Day, day) {
+				items := []*model.Item{
+					&model.Item{
+						ID:   &material.TwoStarName,
+						Name: &material.TwoStarName,
+					},
+					&model.Item{
+						ID:   &material.ThreeStarName,
+						Name: &material.ThreeStarName,
+					},
+					&model.Item{
+						ID:   &material.FourStarName,
+						Name: &material.FourStarName,
+					},
+				}
 
-	for key := range talentMaterials {
-		talentMaterial := talentMaterials[key]
-		if utils.In(talentMaterial.Day, day) {
-			materials = append(materials, &model.ItemGroup{
-				Name:   talentMaterial.Name,
-				Day:    &day,
-				Domain: &talentMaterial.Domain,
-				Items:  make([]*model.Item, 0),
-				Type:   &utils.TALENT_MATERIAL_TYPE,
-			})
+				mu.Lock()
+				materials = append(materials, &model.ItemGroup{
+					Name:   material.Name,
+					Day:    &day,
+					Domain: &material.Domain,
+					Items:  items,
+					Type:   &material.Type,
+				})
+				mu.Unlock()
+			}
 		}
 	}
 
-	for key := range weaponMaterials {
-		weaponMaterial := weaponMaterials[key]
-		if utils.In(weaponMaterial.Day, day) {
-			materials = append(materials, &model.ItemGroup{
-				Name:   weaponMaterial.Name,
-				Day:    &day,
-				Domain: &weaponMaterial.Domain,
-				Items:  make([]*model.Item, 0),
-				Type:   &utils.WEAPON_MATERIAL_TYPE,
-			})
-		}
-	}
+	go filterMaterial(talentMaterials)
+	go filterMaterial(weaponMaterials)
+	wg.Wait()
 
 	return &model.Daily{
 		Date:      &today,
