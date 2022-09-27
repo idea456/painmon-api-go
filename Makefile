@@ -1,5 +1,5 @@
 start:
-	go run api/server.go
+	cd api && go build && ./painmon-api-go
 
 update:
 	./scripts/fetch-data.sh

@@ -7,13 +7,13 @@ import (
 	"context"
 	"fmt"
 	"sync"
-	"time"
 
 	"github.com/idea456/painmon-api-go/graph/generated"
-	model "github.com/idea456/painmon-api-go/graph/model"
+	"github.com/idea456/painmon-api-go/graph/model"
+	"github.com/idea456/painmon-api-go/internal/controllers"
 	"github.com/idea456/painmon-api-go/internal/database"
 	"github.com/idea456/painmon-api-go/internal/types"
-	utils "github.com/idea456/painmon-api-go/pkg/utils"
+	"github.com/idea456/painmon-api-go/pkg/utils"
 )
 
 // GetDomainCategories is the resolver for the getDomainCategories field.
@@ -66,58 +66,16 @@ func (r *queryResolver) GetDomainCategories(ctx context.Context) ([]*model.Domai
 
 // GetDaily is the resolver for the getDaily field.
 func (r *queryResolver) GetDaily(ctx context.Context) (*model.Daily, error) {
-	today := time.Now()
-	day := today.Weekday().String()
+	daily := controllers.NewDailyController()
 
-	talentMaterials := database.GetCategory[types.Material](utils.TALENT_MATERIAL)
-	weaponMaterials := database.GetCategory[types.Material](utils.WEAPON_MATERIAL)
-
-	var wg sync.WaitGroup
-	var mu sync.Mutex
-	wg.Add(2)
-
-	materials := make([]*model.ItemGroup, 0)
-	filterMaterial := func(array map[string]types.Material) {
-		defer wg.Done()
-		for key := range array {
-			material := array[key]
-			if utils.In(material.Day, day) {
-				items := []*model.Item{
-					&model.Item{
-						ID:   &material.TwoStarName,
-						Name: &material.TwoStarName,
-					},
-					&model.Item{
-						ID:   &material.ThreeStarName,
-						Name: &material.ThreeStarName,
-					},
-					&model.Item{
-						ID:   &material.FourStarName,
-						Name: &material.FourStarName,
-					},
-				}
-
-				mu.Lock()
-				materials = append(materials, &model.ItemGroup{
-					Name:   material.Name,
-					Day:    &day,
-					Domain: &material.Domain,
-					Items:  items,
-					Type:   &material.Type,
-				})
-				mu.Unlock()
-			}
-		}
-	}
-
-	go filterMaterial(talentMaterials)
-	go filterMaterial(weaponMaterials)
-	wg.Wait()
+	daily.GetDailies()
 
 	return &model.Daily{
-		Date:      &today,
-		Day:       &day,
-		Materials: materials,
+		Date:       daily.Date,
+		Day:        &daily.Day,
+		Materials:  daily.Materials,
+		Characters: daily.Characters,
+		Weapons:    daily.Weapons,
 	}, nil
 }
 

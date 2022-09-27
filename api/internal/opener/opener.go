@@ -29,7 +29,7 @@ func OpenJSON[T types.Entry](path string) T {
 	home := ChangeHomeDirectory()
 	jsonFile, err := os.Open(filepath.Join(home, path))
 	if err != nil {
-		log.Fatal("Unable to open JSON file!")
+		log.Fatalf("Unable to open JSON file %s!\n", path)
 	}
 	defer jsonFile.Close()
 

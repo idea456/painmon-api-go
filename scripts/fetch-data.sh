@@ -1,7 +1,7 @@
 DIR="$PWD/db/data"
 
 #required subdirectories to fetch data only
-PATHS=("talents" "talentmaterialtypes" "weapons" "weaponmaterialtypes" "artifacts" "domains")
+PATHS=("talents" "talentmaterialtypes" "weapons" "weaponmaterialtypes" "artifacts" "domains", "characters")
 
 if [ -d "$DIR" ]; then
     if [ $PWD != $DIR ]; then

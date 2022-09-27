@@ -13,14 +13,13 @@ import (
 	"github.com/idea456/painmon-api-go/graph"
 	"github.com/idea456/painmon-api-go/graph/generated"
 	"github.com/idea456/painmon-api-go/internal/database"
+	"github.com/idea456/painmon-api-go/pkg/utils"
 )
-
-const defaultPort = "8080"
 
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = defaultPort
+		port = utils.DEFAULT_PORT
 	}
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
@@ -30,6 +29,7 @@ func main() {
 
 	db := database.InitializeDatabase()
 	db.InsertAll()
+	db.PreprocessDailies()
 	// Set(rh, "ballad", obj)
 	// res := Get(rh, "ballad")
 	// var objGet Talent
@@ -38,7 +38,6 @@ func main() {
 	// 	log.Fatalf("Unable to unmarshall object: %+v\n", err)
 	// }
 	// log.Printf("Got object: %+v\n", objGet.Costs["lvl10"])
-
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 	// repl.InitREPL(db)

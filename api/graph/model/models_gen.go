@@ -6,10 +6,20 @@ import (
 	"time"
 )
 
+type Character struct {
+	Name    string  `json:"name"`
+	Rarity  *int    `json:"rarity"`
+	Element *string `json:"element"`
+	Sex     *string `json:"sex"`
+	Nation  *string `json:"nation"`
+}
+
 type Daily struct {
-	Date      *time.Time   `json:"date"`
-	Day       *string      `json:"day"`
-	Materials []*ItemGroup `json:"materials"`
+	Date       *time.Time   `json:"date"`
+	Day        *string      `json:"day"`
+	Materials  []*ItemGroup `json:"materials"`
+	Characters []*Character `json:"characters"`
+	Weapons    []*Weapon    `json:"weapons"`
 }
 
 type Domain struct {
@@ -36,4 +46,15 @@ type ItemGroup struct {
 	Domain *string `json:"domain"`
 	Items  []*Item `json:"items"`
 	Type   *string `json:"type"`
+}
+
+type Weapon struct {
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	Type        *string `json:"type"`
+	Rarity      *int    `json:"rarity"`
+	Atk         *int    `json:"atk"`
+	Substat     *string `json:"substat"`
+	Effectname  *string `json:"effectname"`
+	Effect      *string `json:"effect"`
 }

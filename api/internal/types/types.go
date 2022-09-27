@@ -12,13 +12,35 @@ import "time"
 // 	Domain      string   `json:"dropdomain"`
 // }
 
+type Character struct {
+	Name        string `json:"name"`
+	Book        string
+	Day         string
+	Description string    `json:"description"`
+	Rarity      string    `json:"rarity"`
+	Element     string    `json:"element"`
+	Sex         string    `json:"gender"`
+	Nation      string    `json:"region"`
+	Affiliation string    `json:"affiliation"`
+	Birthday    string    `json:"birthday"`
+	Ascension   Ascension `json:"costs"`
+	Materials   Talent
+}
+
+type Ascension struct {
+	Costs []Cost `json:"ascend6"`
+}
+type Cost struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
 type Talent struct {
 	Name  string     `json:"name"`
 	Costs TalentCost `json:"costs"`
 }
 
 type TalentCost struct {
-	Cost []map[string]string `json:"lvl10"`
+	Cost []Cost `json:"lvl10"`
 }
 
 // type TalentMaterial struct {
@@ -43,22 +65,22 @@ type Material struct {
 	FourStarName  string   `json:"4starname"`
 	Day           []string `json:"day"`
 	Domain        string   `json:"domainofmastery"`
+	Characters    []Character
+	Weapons       []Weapon
 }
 
 type Weapon struct {
-	Name     string `json:"name"`
-	Rarity   string `json:"rarity"`
-	Material string `json:"weaponmaterialtype"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Type        string `json:"weapontype"`
+	Day         string
+	Atk         int    `json:"baseatk"`
+	Substat     string `json:"substat"`
+	EffectName  string `json:"effectname"`
+	Effect      string `json:"effect"`
+	Rarity      string `json:"rarity"`
+	Material    string `json:"weaponmaterialtype"`
 }
-
-// type WeaponMaterial struct {
-// 	Name          string   `json:"name"`
-// 	TwoStarName   string   `json:"2starname"`
-// 	ThreeStarName string   `json:"3starname"`
-// 	FourStarName  string   `json:"4starname"`
-// 	Day           []string `json:"day"`
-// 	Domain        string   `json:"domainofforgery"`
-// }
 
 type Domain struct {
 	Name           string   `json:"name"`
@@ -84,12 +106,11 @@ type Reward struct {
 }
 
 type Entry interface {
-	Artifact | Talent | Weapon | Material | Domain | DomainCategory
+	Artifact | Character | Talent | Weapon | Material | Domain | DomainCategory | []Material
 }
 type Daily struct {
-	Date      time.Time
-	Day       string
-	Materials []Material
-	// TalentMaterials []Material
-	// WeaponMaterials []Material
+	Date       time.Time
+	Day        string
+	Materials  []Material
+	Characters []Character
 }

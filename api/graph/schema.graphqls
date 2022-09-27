@@ -30,10 +30,31 @@ type ItemGroup {
     type: String
 }
 
+type Character {
+    name: String!
+    rarity: Int
+    element: String
+    sex: String
+    nation: String
+}
+
+type Weapon {
+    name: String!
+    description: String
+    type: String
+    rarity: Int
+    atk: Int
+    substat: String
+    effectname: String
+    effect: String
+}
+
 type Daily {
     date: Time
     day: String
     materials: [ItemGroup]
+    characters: [Character]
+    weapons: [Weapon]
 }
 
 type Query {
